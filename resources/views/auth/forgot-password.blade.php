@@ -1,25 +1,46 @@
-<x-guest-layout>
-    <div class="mb-4 text-sm text-gray-600 dark:text-gray-400">
-        {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-    </div>
+<x-default-layout :title="__('auth.forgot_password')">
+    <x-ui.authentication-card>
+        <x-slot name="logo">
+            <x-ui.authentication-card-logo />
+        </x-slot>
 
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+        <!-- Session Status -->
+        @if (session('status'))
+            <x-ui.authentication-status :status="session('status')" />
+        @endif
 
-    <form method="POST" action="{{ route('password.email') }}">
-        @csrf
-
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            {{ __('passwords.forgot_password_title') }}
+        </h1>
+        <div class="mb-4 text-base font-normal text-gray-500 dark:text-gray-400">
+            {{ __('passwords.forgot_password_sub_title') }}
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Email Password Reset Link') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+        <form method="POST" action="{{ route('password.email') }}" class="space-y-4 md:space-y-6">
+            @csrf
+
+            <!-- Email -->
+            <x-forms.input :label="__('login.email')" :hint="__('login.email_hint')" id="email" name="email" type="email"
+                :placeholder="__('login.email_placeholder')" :value="old('email')" autofocus required :success="session('status')" />
+            <!-- Consent ToS & PP -->
+            <x-ui.tos-consent :value="old('terms')" required />
+            <!-- Submit -->
+            <x-ui.button-only x-data="{ show: true }" type="submit" class="w-full" x-bind:disabled="!show"
+                x-bind:class="{ '!cursor-not-allowed !opacity-50': !show }">
+                <div class="flex items-center justify-center">
+                    <span x-on:htmx:xhr:progress.window="show=false" class="flex me-2">
+                        <x-tabler-mail class="w-6 h-6" x-show="show" />
+                        <x-ui.spinner size="md" x-show="!show" />
+                    </span>
+                    <span class="truncate">{{ __('passwords.email_forgot_password_link') }}</span>
+                </div>
+            </x-ui.button-only>
+        </form>
+        <!-- Login Link -->
+        <p class="mt-6 text-sm font-light text-gray-500 dark:text-gray-400">
+            {{ __('auth.forgot_password_login_prefix') }}
+            <x-ui.link :href="route('login')" class="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                {{ __('auth.forgot_password_login') }}</x-ui.link>
+        </p>
+    </x-ui.authentication-card>
+</x-default-layout>

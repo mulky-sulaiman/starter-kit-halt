@@ -1,52 +1,52 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('register') }}">
-        @csrf
+<x-default-layout :title="__('auth.register')">
+    <x-ui.authentication-card>
+        <x-slot name="logo">
+            <x-ui.authentication-card-logo />
+        </x-slot>
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-        </div>
+        <!-- Session Status -->
+        @if (session('status'))
+            <x-ui.authentication-status :status="session('status')" />
+        @endif
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
+            {{ __('register.title') }}
+        </h1>
+        <form method="POST" :action="route('register')" class="space-y-4 md:space-y-6">
+            @csrf
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
-            <x-primary-button class="ms-4">
-                {{ __('Register') }}
-            </x-primary-button>
-        </div>
-    </form>
-</x-guest-layout>
+            <!-- Name -->
+            <x-forms.input :label="__('register.name')" :hint="__('register.name_hint')" id="name" name="name" type="text"
+                :placeholder="__('register.name_placeholder')" :value="old('name')" required autofocus autocomplete="name" />
+            <!-- Email Address -->
+            <x-forms.input :label="__('register.email')" :hint="__('register.email_hint')" id="email" name="email" type="email"
+                :placeholder="__('register.email_placeholder')" :value="old('email')" required autocomplete="username" />
+            <!-- Password -->
+            <x-forms.input :label="__('register.password')" :hint="__('register.password_hint')" type="password" id="password" name="password" required
+                autocomplete="new-password" />
+            <!-- Password Confirmation -->
+            <x-forms.input :label="__('register.password_confirmation')" :hint="__('register.password_confirmation_hint')" type="password" id="password_confirmation"
+                name="password_confirmation" required autocomplete="new-password" />
+            <!-- Consent ToS & PP -->
+            <x-ui.tos-consent :value="old('terms')" required />
+            <!-- Submit -->
+            <x-ui.button-only x-data="{ show: true }" type="submit" class="w-full" x-bind:disabled="!show"
+                x-bind:class="{ '!cursor-not-allowed !opacity-50': !show }">
+                <div class="flex items-center justify-center">
+                    <span x-on:htmx:xhr:progress.window="show=false" class="flex me-2">
+                        <x-tabler-user-plus class="w-6 h-6" x-show="show" />
+                        <x-ui.spinner size="md" x-show="!show" />
+                    </span>
+                    <span>{{ __('register.register') }}</span>
+                </div>
+            </x-ui.button-only>
+            <!-- Login Link -->
+            <p class="text-sm font-light text-gray-500 dark:text-gray-400">
+                {{ __('register.login_prefix') }}
+                <x-ui.link :href="route('login')"
+                    class="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                    {{ __('register.login') }}</x-ui.link>
+            </p>
+        </form>
+    </x-ui.authentication-card>
+</x-default-layout>

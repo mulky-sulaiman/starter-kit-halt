@@ -1,15 +1,22 @@
 <?php
 
+use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use Mauricius\LaravelHtmx\Http\HtmxResponseClientRefresh;
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::post('/locale', function () {
+    // Validate
+    $validated = request()->validate([
+        'language' => 'required|string|in:en,id',
+    ]);
+    // Put Locale into Session
+    session()->put('locale', $validated['language']);
+    // Response for force reload the locale
+    // return new HtmxResponseClientRefresh();
+    return redirect()->back();
+})->name('set.language');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -17,4 +24,8 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+Route::resource('blog', BlogController::class);
+Route::resource('contacts', ContactController::class);
+
+
+require __DIR__ . '/auth.php';
